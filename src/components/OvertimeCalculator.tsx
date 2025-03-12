@@ -146,8 +146,12 @@ const OvertimeCalculator: React.FC = () => {
             // الأجر الأساسي للساعة = 'الراتب الأساسي (ريال سعودي)' ÷ 30 ÷ 'سياسة ساعات العمل اليومية'
             const basicSalaryPerHour = Number(basicSalary) / 30 / Number(dailyWorkHours);
 
-            // أجر ساعات العمل الإضافي = 'عدد ساعات العمل الإضافية' × (الأجر الكامل للساعة + 50% × الأجر الأساسي للساعة)
-            const overtimeAmount = Number(overtimeHours) * (fullSalaryPerHour + (0.5 * basicSalaryPerHour));
+            let overtimeAmount = Number(overtimeHours) * (fullSalaryPerHour + (0.5 * basicSalaryPerHour));
+
+            if (workType === 'holiday') {
+              overtimeAmount = Number(overtimeHours) * 2 * fullSalaryPerHour;
+            }
+
             setResult({
               regularHourlyRate: fullSalaryPerHour,
               overtimeHourlyRate: fullSalaryPerHour + (0.5 * basicSalaryPerHour),
