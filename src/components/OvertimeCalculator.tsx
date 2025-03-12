@@ -51,6 +51,14 @@ const OvertimeCalculator: React.FC = () => {
       }
 
       if (salaryCalculationBase === 'total' && ((totalSalary === '' || typeof totalSalary !== 'number' || totalSalary <= 0) || (basicSalary === '' || typeof basicSalary !== 'number' || basicSalary <= 0))) {
+        if (basicSalary !== '' && totalSalary !== '' && Number(basicSalary) > Number(totalSalary)) {
+          toast({
+            title: "خطأ في الإدخال",
+            description: "الراتب الأساسي يجب أن يكون أقل من أو يساوي الراتب الإجمالي",
+            variant: "destructive",
+          });
+          return false;
+        }
         toast({
           title: "خطأ في الإدخال",
           description: "يرجى إدخال الراتب الإجمالي والأساسي بشكل صحيح",
@@ -121,13 +129,10 @@ const OvertimeCalculator: React.FC = () => {
             calculationBase = Number(basicSalary);
             break;
           case 'total':
-            calculationBase = Number(totalSalary);
-            break;
-          case 'total':
             // Apply the provided formula
-            const fullSalaryPerHour = Number(totalSalary) / 30 / Number(dailyWorkHours);
-            const basicSalaryPerHour = Number(basicSalary) / 30 / Number(dailyWorkHours);
-            regularHourlyRate = fullSalaryPerHour + (0.5 * basicSalaryPerHour);
+            const fullSalaryPerHour = Number(totalSalary);
+            const basicSalaryPerHour = Number(basicSalary);
+            regularHourlyRate = (fullSalaryPerHour / 30 / Number(dailyWorkHours)) + (0.5 * (basicSalaryPerHour / 30 / Number(dailyWorkHours)));
             break;
           case 'percentage':
             calculationBase = Number(totalSalary) * (percentageOfTotal / 100);
@@ -285,9 +290,23 @@ const OvertimeCalculator: React.FC = () => {
                       />
                     </div>
                   )}
+
+                  {salaryCalculationBase === 'total' && (
+                    <div className="space-y-3">
+                      <Label htmlFor="basicSalary" className="text-right block text-lg">الراتب الأساسي (ريال سعودي)</Label>
+                      <Input
+                        id="basicSalary"
+                        type="number"
+                        placeholder="الراتب الأساسي"
+                        className="premium-input text-right text-lg h-12"
+                        value={basicSalary}
+                        onChange={(e) => setBasicSalary(e.target.value ? Number(e.target.value) : '')}
+                      />
+                    </div>
+                  )}
                 </>
               )}
-              
+
               <div className="space-y-3">
                 <Label htmlFor="overtimeHours" className="text-right block text-lg">عدد ساعات العمل الإضافية</Label>
                 <Input
