@@ -149,7 +149,8 @@ const OvertimeCalculator: React.FC = () => {
             let overtimeAmount = Number(overtimeHours) * (fullSalaryPerHour + (0.5 * basicSalaryPerHour));
 
             if (workType === 'holiday') {
-              overtimeAmount = Number(overtimeHours) * 2 * fullSalaryPerHour;
+              // إجمالي أجر العمل الإضافي = عدد ساعات العمل الإضافي × (الأجر الكامل للساعة + الأجر الأساسي للساعة)
+              overtimeAmount = Number(overtimeHours) * (fullSalaryPerHour + basicSalaryPerHour);
             }
 
             setResult({
@@ -395,7 +396,7 @@ const OvertimeCalculator: React.FC = () => {
                     <RadioGroupItem value="holiday" id="holiday" className="ml-2" />
                   </div>
                   <p className="text-sm text-muted-foreground text-right">
-                    سياسة العمل الإضافي (200%) تعتبر ميزة إضافية تقدمها بعض المنشآت، وليست إلزامية وفق نظام العمل.
+                    تنويه: هذه السياسة تعتبر ميزة إضافية تقدمها بعض المنشآت، وليست إلزامية وفق نظام العمل.
                   </p>
                   <div className="flex items-center justify-end space-x-2 space-x-reverse">
                     <Label htmlFor="nightShift" className="text-base cursor-pointer">
