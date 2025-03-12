@@ -50,8 +50,26 @@ const OvertimeCalculator: React.FC = () => {
         return false;
       }
 
-      if (salaryCalculationBase === 'total' && ((totalSalary === '' || typeof totalSalary !== 'number' || totalSalary <= 0) || (basicSalary === '' || typeof basicSalary !== 'number' || basicSalary <= 0))) {
-        if (basicSalary !== '' && totalSalary !== '' && Number(basicSalary) > Number(totalSalary)) {
+      if (salaryCalculationBase === 'total') {
+        if (totalSalary === '' || typeof totalSalary !== 'number' || totalSalary <= 0) {
+          toast({
+            title: "خطأ في الإدخال",
+            description: "يرجى إدخال الراتب الإجمالي بشكل صحيح",
+            variant: "destructive",
+          });
+          return false;
+        }
+
+        if (basicSalary === '' || typeof basicSalary !== 'number' || basicSalary <= 0) {
+          toast({
+            title: "خطأ في الإدخال",
+            description: "يرجى إدخال الراتب الأساسي بشكل صحيح",
+            variant: "destructive",
+          });
+          return false;
+        }
+
+        if (Number(basicSalary) > Number(totalSalary)) {
           toast({
             title: "خطأ في الإدخال",
             description: "الراتب الأساسي يجب أن يكون أقل من أو يساوي الراتب الإجمالي",
@@ -59,12 +77,6 @@ const OvertimeCalculator: React.FC = () => {
           });
           return false;
         }
-        toast({
-          title: "خطأ في الإدخال",
-          description: "يرجى إدخال الراتب الإجمالي والأساسي بشكل صحيح",
-          variant: "destructive",
-        });
-        return false;
       }
 
       if (salaryCalculationBase === 'percentage' && (totalSalary === '' || typeof totalSalary !== 'number' || totalSalary <= 0)) {
@@ -129,11 +141,22 @@ const OvertimeCalculator: React.FC = () => {
             calculationBase = Number(basicSalary);
             break;
           case 'total':
-            // Apply the provided formula
-            const fullSalaryPerHour = Number(totalSalary);
-            const basicSalaryPerHour = Number(basicSalary);
-            regularHourlyRate = (fullSalaryPerHour / 30 / Number(dailyWorkHours)) + (0.5 * (basicSalaryPerHour / 30 / Number(dailyWorkHours)));
-            break;
+            // الأجر الكامل للساعة = 'الراتب الإجمالي (ريال سعودي)' ÷ 30 ÷ 'سياسة ساعات العمل اليومية'
+            const fullSalaryPerHour = Number(totalSalary) / 30 / Number(dailyWorkHours);
+
+            // الأجر الأساسي للساعة = 'الراتب الأساسي (ريال سعودي)' ÷ 30 ÷ 'سياسة ساعات العمل اليومية'
+            const basicSalaryPerHour = Number(basicSalary) / 30 / Number(dailyWorkHours);
+
+            // أجر ساعات العمل الإضافي = 'عدد ساعات العمل الإضافية' × (الأجر الكامل للساعة + 50% × الأجر الأساسي للساعة)
+            const overtimeAmount = Number(overtimeHours) * (fullSalaryPerHour + (0.5 * basicSalaryPerHour));
+            setResult({
+              regularHourlyRate: fullSalaryPerHour,
+              overtimeHourlyRate: fullSalaryPerHour + (0.5 * basicSalaryPerHour),
+              totalOvertimeAmount: overtimeAmount
+            });
+            setIsCalculating(false);
+            setShowResult(true);
+            return;
           case 'percentage':
             calculationBase = Number(totalSalary) * (percentageOfTotal / 100);
             break;
