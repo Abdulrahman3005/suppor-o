@@ -181,7 +181,7 @@ const OvertimeCalculator: React.FC = () => {
       if (workType === 'holiday') {
         // أجر ساعات العمل الإضافي = 'عدد ساعات العمل الإضافية' × 2 × 'الأجر الكامل للساعة'
         overtimeHourlyRate = regularHourlyRate * 2;
-        totalOvertimeAmount = Number(overtimeHours) * 2 * regularHourlyRate;
+        totalOvertimeAmount = Number(overtimeHours) * overtimeHourlyRate;
         toast({
           title: "تنبيه",
           description: "نسبة الـ 200% تعتبر ميزة إضافية وليست شرطاً قانونياً.",
