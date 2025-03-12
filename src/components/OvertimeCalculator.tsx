@@ -50,10 +50,10 @@ const OvertimeCalculator: React.FC = () => {
         return false;
       }
 
-      if (salaryCalculationBase === 'total' && (totalSalary === '' || typeof totalSalary !== 'number' || totalSalary <= 0)) {
+      if (salaryCalculationBase === 'total' && ((totalSalary === '' || typeof totalSalary !== 'number' || totalSalary <= 0) || (basicSalary === '' || typeof basicSalary !== 'number' || basicSalary <= 0))) {
         toast({
           title: "خطأ في الإدخال",
-          description: "يرجى إدخال الراتب الإجمالي بشكل صحيح",
+          description: "يرجى إدخال الراتب الإجمالي والأساسي بشكل صحيح",
           variant: "destructive",
         });
         return false;
@@ -109,19 +109,23 @@ const OvertimeCalculator: React.FC = () => {
     // Simulate calculation delay for a better UX
     setTimeout(() => {
       let regularHourlyRate: number;
-      
+
       // Calculate regular hourly rate based on the selected method
       if (useCustomRate) {
         regularHourlyRate = Number(customHourlyRate);
       } else {
         let calculationBase: number;
-        
+
         switch (salaryCalculationBase) {
           case 'basic':
             calculationBase = Number(basicSalary);
             break;
           case 'total':
             calculationBase = Number(totalSalary);
+            // Apply the provided formula
+            const fullSalaryPerHour = Number(totalSalary) / 30 / Number(dailyWorkHours);
+            const basicSalaryPerHour = Number(basicSalary) / 30 / Number(dailyWorkHours);
+            regularHourlyRate = fullSalaryPerHour + (0.5 * basicSalaryPerHour);
             break;
           case 'percentage':
             calculationBase = Number(totalSalary) * (percentageOfTotal / 100);
@@ -129,20 +133,22 @@ const OvertimeCalculator: React.FC = () => {
           default:
             calculationBase = Number(basicSalary);
         }
-        
-        // Regular hourly rate = Calculation Base ÷ 30 days ÷ dailyWorkHours hours
-        regularHourlyRate = calculationBase / 30 / Number(dailyWorkHours);
+
+        if (salaryCalculationBase !== 'total') {
+          // Regular hourly rate = Calculation Base ÷ 30 days ÷ dailyWorkHours hours
+          regularHourlyRate = calculationBase / 30 / Number(dailyWorkHours);
+        }
       }
-      
+
       // Apply multipliers based on work type
       let multiplier = 1.5; // Default for regular overtime
-      
+
       if (workType === 'holiday') {
         multiplier = 2.0; // 200% on holidays
       } else if (workType === 'nightShift') {
         multiplier = 1.75; // 175% on night shifts
       }
-      
+
       const overtimeHourlyRate = regularHourlyRate * multiplier;
       const totalOvertimeAmount = overtimeHourlyRate * Number(overtimeHours);
       
