@@ -390,6 +390,9 @@ const OvertimeCalculator: React.FC = () => {
                     </Label>
                     <RadioGroupItem value="holiday" id="holiday" className="ml-2" />
                   </div>
+                  <p className="text-sm text-muted-foreground text-right">
+                    سياسة العمل الإضافي (200%) تعتبر ميزة إضافية تقدمها بعض المنشآت، وليست إلزامية وفق نظام العمل.
+                  </p>
                   <div className="flex items-center justify-end space-x-2 space-x-reverse">
                     <Label htmlFor="nightShift" className="text-base cursor-pointer">
                       نوبات العمل الليلية (175%)
