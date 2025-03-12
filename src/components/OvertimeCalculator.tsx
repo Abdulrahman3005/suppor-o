@@ -73,7 +73,6 @@ const OvertimeCalculator: React.FC = () => {
           toast({
             title: "خطأ في الإدخال",
             description: "الراتب الأساسي يجب أن يكون أقل من أو يساوي الراتب الإجمالي",
-            variant: "destructive",
           });
           return false;
         }
@@ -172,15 +171,25 @@ const OvertimeCalculator: React.FC = () => {
 
       // Apply multipliers based on work type
       let multiplier = 1.5; // Default for regular overtime
+      let overtimeHourlyRate: number;
+      let totalOvertimeAmount: number;
 
       if (workType === 'holiday') {
-        multiplier = 2.0; // 200% on holidays
+        // أجر ساعات العمل الإضافي = 'عدد ساعات العمل الإضافية' × 2 × 'الأجر الكامل للساعة'
+        overtimeHourlyRate = regularHourlyRate * 2;
+        totalOvertimeAmount = Number(overtimeHours) * 2 * regularHourlyRate;
+        toast({
+          title: "تنبيه",
+          description: "نسبة الـ 200% تعتبر ميزة إضافية وليست شرطاً قانونياً.",
+        });
       } else if (workType === 'nightShift') {
         multiplier = 1.75; // 175% on night shifts
+        overtimeHourlyRate = regularHourlyRate * multiplier;
+        totalOvertimeAmount = overtimeHourlyRate * Number(overtimeHours);
+      } else {
+        overtimeHourlyRate = regularHourlyRate * multiplier;
+        totalOvertimeAmount = overtimeHourlyRate * Number(overtimeHours);
       }
-
-      const overtimeHourlyRate = regularHourlyRate * multiplier;
-      const totalOvertimeAmount = overtimeHourlyRate * Number(overtimeHours);
       
       setResult({
         regularHourlyRate,
