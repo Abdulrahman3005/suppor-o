@@ -170,6 +170,7 @@ const OvertimeCalculator: React.FC = () => {
       }
 
       // Apply multipliers based on work type
+      let multiplier = 1.5; // Default for regular overtime
       let overtimeHourlyRate: number;
       let totalOvertimeAmount: number;
 
@@ -182,11 +183,10 @@ const OvertimeCalculator: React.FC = () => {
           description: "نسبة الـ 200% تعتبر ميزة إضافية وليست شرطاً قانونياً.",
         });
       } else if (workType === 'nightShift') {
-        const multiplier = 1.75; // 175% on night shifts
+        multiplier = 1.75; // 175% on night shifts
         overtimeHourlyRate = regularHourlyRate * multiplier;
         totalOvertimeAmount = overtimeHourlyRate * Number(overtimeHours);
       } else {
-        const multiplier = 1.5;
         overtimeHourlyRate = regularHourlyRate * multiplier;
         totalOvertimeAmount = overtimeHourlyRate * Number(overtimeHours);
       }
