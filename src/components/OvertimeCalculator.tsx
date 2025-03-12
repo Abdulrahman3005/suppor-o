@@ -122,6 +122,8 @@ const OvertimeCalculator: React.FC = () => {
             break;
           case 'total':
             calculationBase = Number(totalSalary);
+            break;
+          case 'total':
             // Apply the provided formula
             const fullSalaryPerHour = Number(totalSalary) / 30 / Number(dailyWorkHours);
             const basicSalaryPerHour = Number(basicSalary) / 30 / Number(dailyWorkHours);
