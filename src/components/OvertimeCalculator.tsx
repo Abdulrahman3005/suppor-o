@@ -146,16 +146,21 @@ const OvertimeCalculator: React.FC = () => {
             // الأجر الأساسي للساعة = 'الراتب الأساسي (ريال سعودي)' ÷ 30 ÷ 'سياسة ساعات العمل اليومية'
             const basicSalaryPerHour = Number(basicSalary) / 30 / Number(dailyWorkHours);
 
-            let overtimeAmount = Number(overtimeHours) * (fullSalaryPerHour + (0.5 * basicSalaryPerHour));
+            let overtimeAmount: number;
 
             if (workType === 'holiday') {
               // إجمالي أجر العمل الإضافي = عدد ساعات العمل الإضافي × (الأجر الكامل للساعة + الأجر الأساسي للساعة)
               overtimeAmount = Number(overtimeHours) * (fullSalaryPerHour + basicSalaryPerHour);
+            } else if (workType === 'nightShift') {
+              // إجمالي أجر العمل الإضافي = عدد ساعات العمل الإضافي × (الأجر الكامل للساعة + 0.75 × الأجر الأساسي للساعة)
+              overtimeAmount = Number(overtimeHours) * (fullSalaryPerHour + (0.75 * basicSalaryPerHour));
+            } else {
+              overtimeAmount = Number(overtimeHours) * (fullSalaryPerHour + (0.5 * basicSalaryPerHour));
             }
 
             setResult({
               regularHourlyRate: fullSalaryPerHour,
-              overtimeHourlyRate: fullSalaryPerHour + (0.5 * basicSalaryPerHour),
+              overtimeHourlyRate: fullSalaryPerHour + (workType === 'holiday' ? basicSalaryPerHour : (workType === 'nightShift' ? 0.75 * basicSalaryPerHour : 0.5 * basicSalaryPerHour)),
               totalOvertimeAmount: overtimeAmount
             });
             setIsCalculating(false);
@@ -220,6 +225,7 @@ const OvertimeCalculator: React.FC = () => {
         className="w-full"
         value={activeTab}
         onValueChange={setActiveTab}
+        dir='rtl'
       >
         <div className="flex justify-center mb-8">
           <TabsList className="grid grid-cols-2 w-[400px] mb-10">
@@ -240,7 +246,7 @@ const OvertimeCalculator: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex items-center justify-end space-x-2 space-x-reverse">
+              <div>
                 <Label htmlFor="useCustomRate" className="text-lg cursor-pointer">
                   استخدام سعر ساعة مخصص
                 </Label>
@@ -248,6 +254,7 @@ const OvertimeCalculator: React.FC = () => {
                   id="useCustomRate" 
                   checked={useCustomRate} 
                   onCheckedChange={setUseCustomRate}
+                  dir='rtl'
                 />
               </div>
 
@@ -270,6 +277,7 @@ const OvertimeCalculator: React.FC = () => {
                     <Select 
                       value={salaryCalculationBase} 
                       onValueChange={setSalaryCalculationBase}
+                      dir='rtl'
                     >
                       <SelectTrigger className="premium-input text-right h-12">
                         <SelectValue placeholder="اختر طريقة الاحتساب" />
@@ -376,33 +384,35 @@ const OvertimeCalculator: React.FC = () => {
                 <p className="text-sm text-muted-foreground text-right">أدخل عدد ساعات العمل اليومية (عادة 8 ساعات). هذه القيمة ستستخدم في احتساب سعر الساعة</p>
               </div>
               
-              <div className="space-y-3">
+              <div className="space-y-3" dir="rtl">
                 <Label className="text-right block text-lg">نوع العمل الإضافي</Label>
                 <RadioGroup 
                   value={workType} 
                   onValueChange={setWorkType}
                   className="flex flex-col space-y-2"
+                  dir='rtl'
                 >
-                  <div className="flex items-center justify-end space-x-2 space-x-reverse">
+                  <div >
+                    <RadioGroupItem value="regular" id="regular" className="ml-2" />
                     <Label htmlFor="regular" className="text-base cursor-pointer">
                       أيام العمل العادية (150%)
                     </Label>
-                    <RadioGroupItem value="regular" id="regular" className="ml-2" />
                   </div>
-                  <div className="flex items-center justify-end space-x-2 space-x-reverse">
+                  <div >
+                    <RadioGroupItem value="holiday" id="holiday" className="ml-2" />
                     <Label htmlFor="holiday" className="text-base cursor-pointer">
                       أيام العطل والإجازات الرسمية (200%)
                     </Label>
-                    <RadioGroupItem value="holiday" id="holiday" className="ml-2" />
                   </div>
                   <p className="text-sm text-muted-foreground text-right">
                     تنويه: هذه السياسة تعتبر ميزة إضافية تقدمها بعض المنشآت، وليست إلزامية وفق نظام العمل.
                   </p>
-                  <div className="flex items-center justify-end space-x-2 space-x-reverse">
-                    <Label htmlFor="nightShift" className="text-base cursor-pointer">
-                      نوبات العمل الليلية (175%)
+                  <div className='cursor-not-allowed'>
+                    <RadioGroupItem value="nightShift" id="nightShift" className="ml-2" disabled />
+                    <Label htmlFor="nightShift" className="text-base line-through cursor-not-allowed">
+                    نوبات العمل الليلية (175%)
                     </Label>
-                    <RadioGroupItem value="nightShift" id="nightShift" className="ml-2" />
+                    <span className='!no-underline'> 🛠️ جاري العمل </span>
                   </div>
                 </RadioGroup>
               </div>
